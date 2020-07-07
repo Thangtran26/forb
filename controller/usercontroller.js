@@ -133,6 +133,30 @@ module.exports = {
         }
     },
 
+    signingg: async (req, res) => {
+        console.log(req.body);
+        
+        User.findOne({ username: req.body.username }).then(
+            user => {
+                if (user) {
+                    res.status(200).json({
+                        message: 'username da co nguoi dung'
+                    });
+                }
+                else {
+                    const googleuser = new User({
+                        username : req.body.name,
+                        email: req.body.email,
+                        avatar: req.body.photoUrl
+                    });
+                    googleuser.save();
+                    return res.status(200).json({
+                        googleuser : googleuser
+                    });
+                }  
+            }) 
+        
+    },
     getoneuser: async (req, res) => {
         User.findOne({
             _id: req.params.id
@@ -157,7 +181,7 @@ module.exports = {
                     message: 'Updated succeeded',
                 });
             } else {
-                req.body.avatar = `http://localhost:3000/${req.file.path}`;
+                req.body.avatar = `https://forb.herokuapp.com/${req.file.path}`;
                 console.log(req.body);
                 await Promise.all([User.updateOne(
                     { _id: req.params.id },

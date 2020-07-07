@@ -32,7 +32,7 @@ app.use(logger('dev'));
 
 app.use('/user',userroute);
 app.use('/uploads', express.static(__dirname + '/uploads'));
-server.listen(port,() =>{
+server.listen(process.env.PORT || port,() =>{
   console.log(`Started server on 3000`);
 });
 const io = require('socket.io')(server);
@@ -55,7 +55,7 @@ app.get('/', async (req, res) => {
 
 
 
-mongoose.connect('mongodb://localhost:27017',{
+mongoose.connect('mongodb+srv://thangtran:Thangmeo26@cluster0.wp2v0.mongodb.net/forb?retryWrites=true&w=majority',{
   useUnifiedTopology: true, useCreateIndex: true
 }).then(() => {console.log('database connected')});
 
