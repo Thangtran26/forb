@@ -135,7 +135,7 @@ module.exports = {
 
     signingg: async (req, res) => {
         console.log(req.body);
-        
+
         User.findOne({ username: req.body.username }).then(
             user => {
                 if (user) {
@@ -145,17 +145,17 @@ module.exports = {
                 }
                 else {
                     const googleuser = new User({
-                        username : req.body.name,
+                        username: req.body.name,
                         email: req.body.email,
                         avatar: req.body.photoUrl
                     });
                     googleuser.save();
                     return res.status(200).json({
-                        googleuser : googleuser
+                        googleuser: googleuser
                     });
-                }  
-            }) 
-        
+                }
+            })
+
     },
     getoneuser: async (req, res) => {
         User.findOne({
@@ -234,36 +234,35 @@ module.exports = {
     like: async (req, res) => {
         User.findOne({ _id: req.body.userId }).then(async result => {
             if (result) {
+                var likedObject = {};
+                const userObject = {
+                    _id: result._id,
+                    username: result.username,
+                    avatar: result.avatar
+                };
                 if (result.userlikedme.indexOf(req.body.likedId) > -1) {
-                    User.findOne({ _id: req.body.likedId }).then(async ketqua => {
-                        
+                    await User.findOne({ _id: req.body.likedId }).then(async ketqua => {
+                        likedObject = Object.assign(likedObject, {
+                            _id: ketqua._id,
+                            username: ketqua.username,
+                            avatar: ketqua.avatar
+                        });
+
                         if (ketqua) {
-                            
-                            ketqua.date.push(req.body.userId);
-                            //console.log(ketqua.date);
-                            await Promise.all([User.updateOne({ _id: req.body.likedId }, { date: ketqua.date })]).then(() => {
-                                return res.status(200).json({
-                                    type: 'success',
-                                });
-                            })
+
+                            ketqua.date.unshift(userObject);
+
+                            await Promise.all([User.updateOne({ _id: req.body.likedId }, { date: ketqua.date })])
                         }
                     })
-                    // User.findOne({ _id: req.body.likedId }).then(async result => {
-                    //     if (result) {
-                    //         result.date.shift(req.body.userId);
-                    //         await Promise.all([User.updateOne({ _id: req.body.likedId }, { date: result.userlikedme })]).then(() => {
-                    //             return res.status(200).json({
-                    //                 type: 'success',
-                    //             });
-                    //         })
-                    //     }
-                    // })
-                    result.date.push(req.body.likedId);
+
+                    result.date.unshift(likedObject);
+
                     await Promise.all([User.updateOne({ _id: req.body.userId }, { date: result.date })])
                     return res.status(200).json({
                         type: 'matched',
                     });
-                    
+
                 }
                 else {
                     User.findOne({ _id: req.body.likedId }).then(async result => {
@@ -299,9 +298,20 @@ module.exports = {
                     return res.status(200).json({
                         crushes,
                     });
-                },100);
+                }, 500);
             })
 
         });
+    },
+    getmatch: async (req, res) => {
+        await User.findOne({
+            _id: req.params.id
+        }).then(async result => {
+            res.status(200).json({
+                ketqua: result.date
+
+
+            });
+        })
     }
 }

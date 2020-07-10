@@ -15,5 +15,5 @@ router.route('/:id').get(usercontroller.getoneuser)
 .post(usercontroller.changepassword);
 router.route('/:id/search').get(querycontroller.filterinfo);
 router.route('/:id/getcrush').get(usercontroller.getcrush);
-
+router.route('/:id/getmatch').get(usercontroller.getmatch);
 module.exports = router;
